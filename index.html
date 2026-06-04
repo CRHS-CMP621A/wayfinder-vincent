@@ -193,13 +193,21 @@
       function setOrientation() {
         let heading = 0;
         let output = document.querySelector(".dir");
-        heading = event.webkitCompassHeading;
-        output.textContent = heading;
+        if (event.webkitCompassHeading !== undefined) {
+          heading = event.webkitCompassHeading; // iOS
+        } else if (event.alpha !== null) {
+          heading = 360 - event.alpha; // Android
+        }
+        if (output) {
+          output.testContent = heading;
+        }
       }
 
-      window.addEventListener("deviceorientationabsolute", {
+      window.addEventListener(
+        "deviceorientationabsolute",
         setOrientation,
-      });
+        true
+      );
 
       function msg(to, from) {
         const edge = orth[from + "_" + to];
