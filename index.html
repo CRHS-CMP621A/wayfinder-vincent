@@ -6,7 +6,7 @@
   </head>
   <body>
     <form action="/submit" method="post">
-      <label for="The_closest_room_to_you">The closest room to you: </label
+      <label for="The_closest_room_to_you">! The closest room to you: </label
       ><input id="The_closest_room_to_you" type="number" />
 
       <label for="The_room_you_want_to_go_to">
@@ -189,6 +189,8 @@
         5: { 3: 3 },
         6: { 3: 1, 1: 2 },
       };
+
+      DeviceOrientationEvent.requestPermission();
 
       function setOrientation(event) {
         let heading = 0;
