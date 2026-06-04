@@ -6,7 +6,7 @@
   </head>
   <body>
     <form action="/submit" method="post">
-      <label for="The_closest_room_to_you">! The closest room to you: </label
+      <label for="The_closest_room_to_you">@ The closest room to you: </label
       ><input id="The_closest_room_to_you" type="number" />
 
       <label for="The_room_you_want_to_go_to">
@@ -16,6 +16,11 @@
       <div class="dir">xxx</div>
 
       <p>
+        <button
+          onclick="DeviceOrientationEvent.requestPermission?.().then(res => res === 'granted' && window.addEventListener('deviceorientationabsolute', e => document.querySelector('.dir').textContent = Math.round(e.webkitCompassHeading || (360 - e.alpha)) + '°')) || window.addEventListener('deviceorientationabsolute', e => document.querySelector('.dir').textContent = Math.round(e.webkitCompassHeading || (360 - e.alpha)) + '°')"
+        >
+          Use Compass
+        </button>
         <button type="button" onClick="getDir()">Get Direction</button>
         <button type="reset">Clear Form</button>
       </p>
@@ -189,27 +194,6 @@
         5: { 3: 3 },
         6: { 3: 1, 1: 2 },
       };
-
-      DeviceOrientationEvent.requestPermission();
-
-      function setOrientation(event) {
-        let heading = 0;
-        let output = document.querySelector(".dir");
-        if (event.webkitCompassHeading !== undefined) {
-          heading = event.webkitCompassHeading; // iOS
-        } else if (event.alpha !== null) {
-          heading = 360 - event.alpha; // Android
-        }
-        if (output) {
-          output.textContent = heading;
-        }
-      }
-
-      window.addEventListener(
-        "deviceorientationabsolute",
-        setOrientation,
-        true
-      );
 
       function msg(to, from) {
         const edge = orth[from + "_" + to];
