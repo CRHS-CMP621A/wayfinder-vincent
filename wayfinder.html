@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rural Wayfinder</title>
+  </head>
+  <body>
+    <form action="/submit" method="post">
+      <label for="The_closest_room_to_you">The closest room to you: </label
+      ><input id="The_closest_room_to_you" type="number" />
+
+      <label for="The_room_you_want_to_go_to">
+        The room you want to go to: </label
+      ><input id="The_room_you_want_to_go_to" type="number" /><br />
+      <br />
+      <div class="dir">xxx</div>
+
+      <p>
+        <button type="button" onClick="getDir()">Get Direction</button>
+        <button type="reset">Clear Form</button>
+      </p>
+    </form>
+    <div id="dirs"></div>
+    <script>
+      const orth = {
+        "0_1": [0, "Biology Blvd", "NW"],
+        "1_0": [0, "Biology Blvd", "SE"],
+        "0_2": [1, "Up the stairs"],
+        "2_0": [1, "Down the stairs"],
+        "2_3": [0, "Labratory Lane", "NW"],
+        "3_2": [0, "Labratory Lane", "SE"],
+        "3_4": [3, "HOW DID YOU GET HERE?"],
+        "4_3": [2],
+        "2_19": [1, "Up the stairs"],
+        "19_2": [1, "Down the stairs"],
+        "19_18": [0, "Willis Way", "NW"],
+        "18_19": [0, "Willis Way", "SE"],
+        "18_17": [3, "Turn West and walk until you reach the Library."],
+        "17_18": [3, "Turn East and Walk towards the math teaching center"],
+        "17_16": [0, "Carson Cres.", "NE"],
+        "16_17": [0, "Carson Cres.", "SW"],
+        "18_3": [1, "Down the stairs"],
+        "3_18": [
+          3,
+          "Head SE towards Labatory lane, but instead, go up the grand staircase.",
+        ],
+        "15_16": [0, "Costello Road", "SE"],
+        "16_15": [0, "Costello Road", "NW"],
+        "15_14": [0, "Shakespeare St", "NE"],
+        "14_15": [0, "Shakespeare St", "SW"],
+        "14_17": [0, "Memory Lane", "SE"],
+        "17_14": [0, "Memory Lane", "NW"],
+        "13_14": 0,
+        "14_13": 0,
+        "14_10": 0,
+        "10_14": 0,
+        "12_11": 0,
+        "11_12": 0,
+        "11_10": 0,
+        "10_11": 0,
+        "10_9": 0,
+        "9_10": 0,
+        "9_8": 0,
+        "8_9": 0,
+        "8_7": 0,
+        "7_8": 0,
+        "3_7": 0,
+        "7_3": 0,
+        "3_9": 0,
+        "9_3": 0,
+        "3_11": 0,
+        "11_3": 0,
+        "5_3": 0,
+        "3_5": 0,
+        "3_6": 0,
+        "6_3": 0,
+        "6_1": 0,
+        "1_6": 0,
+      };
+      const keys = {
+        101: [0, 1, 0.0, 3.0],
+        102: [0, 1, 0.3, 2.7],
+        103: [0, 1, 0.6, 2.4],
+        104: [0, 1, 0.9, 2.1],
+        105: [0, 1, 1.2, 1.8],
+        106: [0, 1, 1.5, 1.5],
+        107: [0, 1, 1.8, 1.2],
+        108: [0, 1, 2.1, 0.9],
+        109: [0, 1, 2.4, 0.6],
+        110: [0, 1, 2.7, 0.3],
+        200: [2, 3, 0.0, 3.0],
+        201: [2, 3, 0.38, 2.62],
+        202: [2, 3, 0.75, 2.25],
+        203: [2, 3, 1.12, 1.88],
+        204: [2, 3, 1.5, 1.5],
+        205: [2, 3, 1.88, 1.12],
+        206: [2, 3, 2.25, 0.75],
+        207: [2, 3, 2.62, 0.38],
+        300: [19, 18, 0.0, 4.0],
+        301: [19, 18, 0.31, 3.69],
+        302: [19, 18, 0.62, 3.38],
+        303: [19, 18, 0.92, 3.08],
+        304: [19, 18, 1.23, 2.77],
+        305: [19, 18, 1.54, 2.46],
+        306: [19, 18, 1.85, 2.15],
+        307: [19, 18, 2.15, 1.85],
+        308: [19, 18, 2.46, 1.54],
+        309: [19, 18, 2.77, 1.23],
+        310: [19, 18, 3.08, 0.92],
+        311: [19, 18, 3.38, 0.62],
+        312: [19, 18, 3.69, 0.31],
+        347: [17, 16, 0.0, 3.0],
+        338: [15, 16, 0.0, 3.0],
+        339: [15, 16, 0.5, 2.5],
+        340: [15, 16, 1.0, 2.0],
+        341: [15, 16, 1.5, 1.5],
+        342: [15, 16, 2.0, 1.0],
+        343: [15, 16, 2.5, 0.5],
+        330: [15, 14, 0.0, 3.0],
+        331: [15, 14, 0.38, 2.62],
+        332: [15, 14, 0.75, 2.25],
+        333: [15, 14, 1.12, 1.88],
+        334: [15, 14, 1.5, 1.5],
+        335: [15, 14, 1.88, 1.12],
+        336: [15, 14, 2.25, 0.75],
+        337: [15, 14, 2.62, 0.38],
+        225: [12, 11, 0.0, 1.0],
+        226: [12, 11, 0.33, 0.67],
+        227: [12, 11, 0.67, 0.33],
+        228: [11, 10, 0.0, 2.0],
+        229: [11, 10, 0.4, 1.6],
+        230: [11, 10, 0.8, 1.2],
+        231: [11, 10, 1.2, 0.8],
+        232: [11, 10, 1.6, 0.4],
+        233: [9, 8, 0.0, 3.0],
+        234: [9, 8, 0.3, 2.7],
+        235: [9, 8, 0.6, 2.4],
+        236: [9, 8, 0.9, 2.1],
+        237: [9, 8, 1.2, 1.8],
+        238: [9, 8, 1.5, 1.5],
+        239: [9, 8, 1.8, 1.2],
+        240: [9, 8, 2.1, 0.9],
+        241: [9, 8, 2.4, 0.6],
+        242: [9, 8, 2.7, 0.3],
+        243: [8, 7, 0.0, 3.0],
+        244: [8, 7, 0.3, 2.7],
+        245: [8, 7, 0.6, 2.4],
+        246: [8, 7, 0.9, 2.1],
+        247: [8, 7, 1.2, 1.8],
+        248: [8, 7, 1.5, 1.5],
+        249: [8, 7, 1.8, 1.2],
+        250: [8, 7, 2.1, 0.9],
+        251: [8, 7, 2.4, 0.6],
+        252: [8, 7, 2.7, 0.3],
+        267: [3, 7, 0.0, 3.0],
+        217: [3, 9, 0.0, 3.0],
+        218: [3, 9, 0.6, 2.4],
+        219: [3, 9, 1.2, 1.8],
+        220: [3, 9, 1.8, 1.2],
+        221: [3, 9, 2.4, 0.6],
+        222: [3, 11, 0.0, 4.0],
+        223: [3, 11, 2.0, 2.0],
+        208: [5, 3, 0.0, 3.0],
+        209: [5, 3, 0.5, 2.5],
+        210: [5, 3, 1.0, 2.0],
+        211: [5, 3, 1.5, 1.5],
+        212: [5, 3, 2.0, 1.0],
+        213: [5, 3, 2.5, 0.5],
+      };
+      const cons = {
+        0: { 1: 3, 2: 3 },
+        1: { 0: 3, 6: 2 },
+        2: { 0: 3, 19: 3, 4: 3 },
+        19: { 2: 3, 18: 4 },
+        4: { 2: 3 },
+        18: { 19: 4, 17: 1, 3: 3 },
+        17: { 18: 1, 16: 3, 14: 3 },
+        16: { 17: 3, 15: 3 },
+        3: { 18: 3, 7: 3, 9: 3, 11: 4, 5: 3, 6: 1 },
+        15: { 16: 3, 14: 3 },
+        14: { 15: 3, 17: 3, 13: 3, 10: 4 },
+        13: { 14: 3 },
+        10: { 14: 4, 11: 2, 9: 1 },
+        12: { 11: 1 },
+        11: { 12: 1, 10: 2, 3: 4 },
+        9: { 10: 1, 8: 3, 3: 3 },
+        8: { 9: 3, 7: 3 },
+        7: { 8: 3, 3: 3 },
+        5: { 3: 3 },
+        6: { 3: 1, 1: 2 },
+      };
+
+      function setOrientation() {
+        let heading = 0;
+        let output = document.querySelector(".dir");
+        heading = event.webkitCompassHeading;
+        output.textContent = heading;
+      }
+
+      window.addEventListener("deviceorientationabsolute", {
+        setOrientation,
+      });
+
+      function msg(to, from) {
+        const edge = orth[from + "_" + to];
+        const choice = edge[0];
+        if (choice == 0) {
+          return `Head ${edge[2]} towards ${edge[1]}`;
+        } else if (choice == 1) {
+          return `Head ${edge[1]}.`;
+        } else if (choice == 2) {
+          return "Placeholder direction";
+        } else if (choice == 3) {
+          return edge[1];
+        }
+      }
+
+      function getDir() {
+        const dirs = document.querySelector("#dirs");
+        dirs.innerHTML = "";
+
+        let start = document.querySelector("#The_closest_room_to_you").value;
+        let end = document.querySelector("#The_room_you_want_to_go_to").value;
+        let targets = keys[end];
+        let nodes = keys[start];
+
+        let distance = {};
+        let predecessor = {};
+        let q = new Set();
+        for (const [key, value] of Object.entries(cons)) {
+          distance[key] = Infinity;
+          predecessor[key] = undefined;
+          q.add(key);
+        } //set up data
+
+        distance[nodes[0].toString()] = nodes[2];
+        distance[nodes[1].toString()] = nodes[3];
+        // set starting distance of all starting nodes to 0
+
+        while (q.size > 0) {
+          let currentNode = "abc";
+          for (let node of q) {
+            if (
+              currentNode == "abc" ||
+              distance[node] < distance[currentNode]
+            ) {
+              currentNode = node;
+            }
+          }
+
+          if (!isFinite(distance[currentNode])) {
+            break;
+          }
+
+          q.delete(currentNode);
+
+          for (const [key, value] of Object.entries(cons[currentNode])) {
+            if (q.has(key)) {
+              d = distance[currentNode] + value;
+
+              if (d < distance[key]) {
+                distance[key] = d;
+                predecessor[key] = currentNode;
+              }
+            }
+          }
+        }
+
+        console.log(predecessor);
+
+        let endpt = targets[0];
+        let dircount = 0;
+        while (predecessor[endpt] != undefined) {
+          if (dircount == 0) {
+            dirs.insertAdjacentHTML(
+              "afterbegin",
+              `<h4>${msg(
+                endpt,
+                predecessor[endpt]
+              )} until you reach your destination.</h4>`
+            );
+          } else {
+            dirs.insertAdjacentHTML(
+              "afterbegin",
+              `<h4>${msg(
+                endpt,
+                predecessor[endpt]
+              )} until you reach an intersection.</h4>`
+            );
+          }
+          endpt = predecessor[endpt];
+          dircount += 1;
+        }
+        if (endpt == nodes[0]) {
+          dirs.insertAdjacentHTML(
+            "afterbegin",
+            `<h4>${msg(endpt, nodes[1])}</h4>`
+          );
+        } else {
+          dirs.insertAdjacentHTML(
+            "afterbegin",
+            `<h4>${msg(endpt, nodes[0])}</h4>`
+          );
+        }
+      }
+    </script>
+  </body>
+</html>
