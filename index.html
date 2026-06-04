@@ -10,7 +10,7 @@
       ><input id="The_closest_room_to_you" type="number" />
 
       <label for="The_room_you_want_to_go_to">
-        !! The room you want to go to: </label
+        The room you want to go to: </label
       ><input id="The_room_you_want_to_go_to" type="number" /><br />
       <br />
       <div class="dir">xxx</div>
@@ -190,7 +190,7 @@
         6: { 3: 1, 1: 2 },
       };
 
-      function setOrientation() {
+      function setOrientation(event) {
         let heading = 0;
         let output = document.querySelector(".dir");
         if (event.webkitCompassHeading !== undefined) {
@@ -199,7 +199,7 @@
           heading = 360 - event.alpha; // Android
         }
         if (output) {
-          output.testContent = heading;
+          output.textContent = heading;
         }
       }
 
