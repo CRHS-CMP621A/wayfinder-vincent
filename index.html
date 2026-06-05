@@ -8,15 +8,13 @@
     <form action="/submit" method="post">
       <label for="The_closest_room_to_you">The closest room to you: </label
       ><input id="The_closest_room_to_you" type="number" />
-
+      <br />
       <label for="The_room_you_want_to_go_to">
         The room you want to go to: </label
       ><input id="The_room_you_want_to_go_to" type="number" /><br />
       <br />
-      <div class="dir">xxx</div>
 
       <p>
-        <button type="button" class="start-btn">Use Compass</button>
         <button type="button" onClick="getDir()">Get Direction</button>
         <button type="reset">Clear Form</button>
       </p>
@@ -191,6 +189,15 @@
         6: { 3: 1, 1: 2 },
       };
 
+      const nodeLocs = {
+        19: [7, 5],
+        18: [4, 5],
+        17: [3, 3],
+        16: [3, 0],
+        15: [0, 0],
+        14: [0, 3],
+      };
+
       function msg(to, from) {
         const edge = orth[from + "_" + to];
         const choice = edge[0];
@@ -206,24 +213,25 @@
       }
 
       function getAngle([ax, ay], [xx, xy], [bx, by]) {
+        let lr = "right";
+
+        const dx1 = xx - ax;
+        const dx2 = bx - xx;
+        const dy1 = xy - ay;
+        const dy2 = by - xy;
+
         const opps = (ax - bx) ** 2 + (ay - by) ** 2;
-        const a = (xx - bx) ** 2 + (xy - by) ** 2;
-        const b = (xx - ax) ** 2 + (xy - ay) ** 2;
+        const a = dx2 ** 2 + dy2 ** 2;
+        const b = dx1 ** 2 + dy1 ** 2;
+
+        if (dx1 * dy2 - dy1 * dx2 < 0) {
+          lr = "left";
+        }
 
         const angle =
           (Math.acos((a + b - opps) / (2 * Math.sqrt(a) * Math.sqrt(b))) *
             180) /
           Math.PI;
-
-        let lr = "Left";
-
-        let m = (by - ay) / (bx - ax);
-
-        let simy = ay + m * (xx - ax);
-
-        if (simy < xy) {
-          lr = "right";
-        }
 
         if (angle > 160) {
           return "Continue stright at the next intersection";
@@ -306,17 +314,21 @@
           }
           if (dircount == 0) {
             dirs.insertAdjacentHTML(
-              "afterbegin,",
-              `<h4>${
-                (endpt, predecessor[endpt], pred2)
-              } until you reach your destination.</h4>`
+              "afterBegin",
+              `<h4>${getAngle(
+                nodeLocs[endpt],
+                nodeLocs[predecessor[endpt]],
+                nodeLocs[pred2]
+              )} and go forwards until you reach your destination.</h4>`
             );
           } else {
             dirs.insertAdjacentHTML(
-              "afterbegin",
-              `<h4>${
-                (endpt, predecessor[endpt], pred2)
-              } until you reach an intersection.</h4>`
+              "afterBegin",
+              `<h4>${getAngle(
+                nodeLocs[endpt],
+                nodeLocs[predecessor[endpt]],
+                nodeLocs[pred2]
+              )} and go forwards until you reach an intersection.</h4>`
             );
           }
           endpt = predecessor[endpt];
