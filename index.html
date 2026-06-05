@@ -16,12 +16,7 @@
       <div class="dir">xxx</div>
 
       <p>
-        <button
-          type="button"
-          onclick="DeviceOrientationEvent.requestPermission?.().then(res => res === 'granted' && window.addEventListener('deviceorientationabsolute', e => document.querySelector('.dir').textContent = Math.round(e.webkitCompassHeading || (360 - e.alpha)) + '°')) || window.addEventListener('deviceorientationabsolute', e => document.querySelector('.dir').textContent = Math.round(e.webkitCompassHeading || (360 - e.alpha)) + '°')"
-        >
-          Use Compass
-        </button>
+        <button type="button" class="start-btn">Use Compass</button>
         <button type="button" onClick="getDir()">Get Direction</button>
         <button type="reset">Clear Form</button>
       </p>
@@ -41,8 +36,8 @@
         "19_2": [1, "Down the stairs"],
         "19_18": [0, "Willis Way", "NW"],
         "18_19": [0, "Willis Way", "SE"],
-        "18_17": [3, "Turn West and walk until you reach the Library."],
-        "17_18": [3, "Turn East and Walk towards the math teaching center"],
+        "18_17": [3, "Continue West and walk until you reach the Library."],
+        "17_18": [3, "Continue East and Walk towards the math teaching center"],
         "17_16": [0, "Carson Cres.", "NE"],
         "16_17": [0, "Carson Cres.", "SW"],
         "18_3": [1, "Down the stairs"],
@@ -200,13 +195,44 @@
         const edge = orth[from + "_" + to];
         const choice = edge[0];
         if (choice == 0) {
-          return `Head ${edge[2]} towards ${edge[1]}`;
+          return `Head ${edge[2]} on ${edge[1]}`;
         } else if (choice == 1) {
           return `Head ${edge[1]}.`;
         } else if (choice == 2) {
           return "Placeholder direction";
         } else if (choice == 3) {
           return edge[1];
+        }
+      }
+
+      function getAngle([ax, ay], [xx, xy], [bx, by]) {
+        const opps = (ax - bx) ** 2 + (ay - by) ** 2;
+        const a = (xx - bx) ** 2 + (xy - by) ** 2;
+        const b = (xx - ax) ** 2 + (xy - ay) ** 2;
+
+        const angle =
+          (Math.acos((a + b - opps) / (2 * Math.sqrt(a) * Math.sqrt(b))) *
+            180) /
+          Math.PI;
+
+        let lr = "Left";
+
+        let m = (by - ay) / (bx - ax);
+
+        let simy = ay + m * (xx - ax);
+
+        if (simy < xy) {
+          lr = "right";
+        }
+
+        if (angle > 160) {
+          return "Continue stright at the next intersection";
+        } else if (angle > 110) {
+          return `Turn a slight ${lr} at the next intersection`;
+        } else if (angle > 75) {
+          return `Turn ${lr} at the next intersection`;
+        } else {
+          return `Turn a sharp ${lr} at the next intersection`;
         }
       }
 
@@ -265,6 +291,49 @@
 
         let endpt = targets[0];
         let dircount = 0;
+
+        while (predecessor[endpt] != undefined) {
+          let pred2;
+          if (
+            predecessor[predecessor[endpt]] == undefined &&
+            predecessor[endpt] == nodes[0]
+          ) {
+            pred2 = nodes[1];
+          } else if (predecessor[predecessor[endpt]] == undefined) {
+            pred2 = nodes[0];
+          } else {
+            pred2 = predecessor[predecessor[endpt]];
+          }
+          if (dircount == 0) {
+            dirs.insertAdjacentHTML(
+              "afterbegin,",
+              `<h4>${
+                (endpt, predecessor[endpt], pred2)
+              } until you reach your destination.</h4>`
+            );
+          } else {
+            dirs.insertAdjacentHTML(
+              "afterbegin",
+              `<h4>${
+                (endpt, predecessor[endpt], pred2)
+              } until you reach an intersection.</h4>`
+            );
+          }
+          endpt = predecessor[endpt];
+          dircount += 1;
+        }
+        if (endpt == nodes[0]) {
+          dirs.insertAdjacentHTML(
+            "afterbegin",
+            `<h4>${msg(endpt, nodes[1])}</h4>`
+          );
+        } else {
+          dirs.insertAdjacentHTML(
+            "afterbegin",
+            `<h4>${msg(endpt, nodes[0])}</h4>`
+          );
+        }
+        /*
         while (predecessor[endpt] != undefined) {
           if (dircount == 0) {
             dirs.insertAdjacentHTML(
@@ -296,7 +365,7 @@
             "afterbegin",
             `<h4>${msg(endpt, nodes[0])}</h4>`
           );
-        }
+        }*/
       }
     </script>
   </body>
