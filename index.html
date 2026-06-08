@@ -5,6 +5,10 @@
     <title>Rural Wayfinder</title>
   </head>
   <body>
+    <h1>Rural Maps</h1>
+    <img
+      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgp4hPjyPmcVLneDX1Jb_Im3aitR0K6-vsGg&s"
+    />
     <form action="/submit" method="post">
       <label for="The_closest_room_to_you">The closest room to you: </label
       ><input id="The_closest_room_to_you" type="number" />
@@ -19,7 +23,31 @@
         <button type="reset">Clear Form</button>
       </p>
     </form>
+
     <div id="dirs"></div>
+    <style>
+      h1 {
+        color: aliceblue;
+        background-color: red;
+        font-size: 50px;
+        padding: 20px;
+      }
+
+      label {
+        color: red;
+      }
+
+      button {
+        color: white;
+        background-color: red;
+        border-radius: 10px;
+        border: none;
+        padding: 5px;
+      }
+      img {
+        margin-top: -30px;
+      }
+    </style>
     <script>
       const orth = {
         "0_1": [0, "Biology Blvd", "NW"],
