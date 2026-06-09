@@ -328,7 +328,7 @@
 
         console.log(predecessor);
 
-        let endpt = targets[0];
+        let endpt = targets[1];
         let dircount = 0;
 
         while (predecessor[endpt] != undefined) {
@@ -350,7 +350,9 @@
                 nodeLocs[endpt],
                 nodeLocs[predecessor[endpt]],
                 nodeLocs[pred2]
-              )} and go forwards until you reach your destination.</h4>`
+              )} and turn into ${
+                orth[targets[0] + "_" + targets[1]][1]
+              }. Your destination is on that road.</h4>`
             );
           } else {
             dirs.insertAdjacentHTML(
